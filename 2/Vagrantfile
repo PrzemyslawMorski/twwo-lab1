@@ -1,20 +1,18 @@
 Vagrant.configure("2") do |config|
   
   config.vm.define "web" do |web|
-    config.vm.box = "hashicorp/precise64"
+    web.vm.box = "hashicorp/precise64"
 
-    config.vbguest.auto_update = true
-    config.vbguest.iso_path = "./VBoxGuestAdditions_5.2.32.iso"
+    web.vbguest.auto_update = false
+    web.vbguest.no_remote = true
 
-  	config.vm.provision "shell", inline: "sudo apt-get update -y; sudo apt-get install apache2 -y"
-
-  	config.vm.provision "file", source: "./static_website_src", destination: "/var/www/html"
+    web.vm.provision "shell", inline: "sudo apt-get update -y; sudo apt-get install apache2 -y"
+    
+    web.vm.provision "file", source: "./static_website_src", destination: "/tmp/static_website_src_tmp"
+    web.vm.provision "shell", inline: "mv /tmp/static_website_src_tmp/* /var/www"
 
     web.vm.network "forwarded_port", guest: 80, host: 8080
     web.vm.network "private_network", ip: "10.0.0.20"
   end
 
-  # config.vm.define "db" do |db|
-  #   web.vm.network "private_network", ip: "10.0.0.21"
-  # end
 end
