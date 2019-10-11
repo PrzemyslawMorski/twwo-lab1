@@ -1,0 +1,19 @@
+Vagrant.configure("2") do |config|
+  
+  config.vm.define "db" do |db|
+    db.vm.hostname = "db"
+    db.vm.box = "hashicorp/precise64"
+
+    db.vbguest.auto_update = false
+    db.vbguest.no_remote = true
+
+    db.vm.provision "file", source: "./setup_db.sh", destination: "/tmp/setup_db.sh"
+    db.vm.provision "shell", inline: "sh /tmp/setup_db.sh"
+
+    db.vm.network "forwarded_port", guest: 15432, host: 5432
+    db.vm.network "private_network", ip: "10.0.0.23"
+  end
+
+  # https://github.com/jacksonpires/crud-node-postgres
+
+end
